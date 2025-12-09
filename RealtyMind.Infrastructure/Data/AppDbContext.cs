@@ -12,5 +12,9 @@ namespace RealtyMind.Infrastructure.Data
 
         public DbSet<User> Users => Set<User>();
         public DbSet<Property> Properties => Set<Property>();
+
+        public DbSet<Poi> Pois => Set<Poi>();
+        public DbSet<NeighborhoodScore> NeighborhoodScores => Set<NeighborhoodScore>();
+
     }
 }

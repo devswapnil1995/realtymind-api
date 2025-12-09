@@ -1,7 +1,8 @@
-using RealtyMind.Application;
-using RealtyMind.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using RealtyMind.Application;
+using RealtyMind.Application.Configurations;
+using RealtyMind.Infrastructure;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,36 @@ builder.Services.AddSwaggerGen();
 // retain existing app service registrations
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
+
+builder.Services.AddHttpClient("GoogleMaps", client =>
+{
+    client.BaseAddress = new Uri("https://maps.googleapis.com/maps/api/");
+});
+
+builder.Services.AddHttpClient("RapidApiClient", client =>
+{
+    client.BaseAddress = new Uri("https://zillow56.p.rapidapi.com/");
+});
+
+
+builder.Services.Configure<GoogleConfig>(builder.Configuration.GetSection("Integrations:Google"));
+builder.Services.Configure<RapidApiConfig>(builder.Configuration.GetSection("Integrations:RapidApi"));
+builder.Services.Configure<MortgageConfig>(builder.Configuration.GetSection("Integrations:Mortgage"));
+
+builder.Services.Configure<OverpassConfig>(builder.Configuration.GetSection("Integrations:Overpass"));
+// Fix for CS8604: Ensure the configuration value is not null before using it to create a Uri.
+builder.Services.AddHttpClient("OverpassClient", c =>
+{
+    var baseUrl = builder.Configuration["Integrations:Overpass:BaseUrl"];
+    if (string.IsNullOrWhiteSpace(baseUrl))
+    {
+        throw new InvalidOperationException("Integrations:Overpass:BaseUrl configuration is missing or empty.");
+    }
+    c.BaseAddress = new Uri(baseUrl);
+});
+builder.Services.AddHttpClient("GooglePlaces", c => c.BaseAddress = new Uri("https://maps.googleapis.com/maps/api/place/"));
+
+builder.Services.AddMemoryCache();
 
 // JWT Authentication Setup
 var jwtSection = builder.Configuration.GetSection("Jwt");

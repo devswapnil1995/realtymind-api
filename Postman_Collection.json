@@ -1,0 +1,471 @@
+{
+  "info": {
+    "name": "RealtyMind API Collection - Updated 2024",
+    "description": "Comprehensive API testing for RealtyMind - Real Estate Intelligence Platform with Mock Data",
+    "version": "2.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health & Status",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            },
+            "description": "Verify API is running and healthy"
+          },
+          "response": []
+        },
+        {
+          "name": "Ping",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/ping",
+              "host": ["{{base_url}}"],
+              "path": ["ping"]
+            },
+            "description": "Simple connectivity test"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register New User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('auth_token', jsonData.token);",
+                  "    pm.environment.set('user_email', 'buyer@realtymind.com');",
+                  "    console.log('? Token saved to auth_token');",
+                  "} else {",
+                  "    console.log('? Registration failed:', pm.response.text());",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"buyer@realtymind.com\", \"password\": \"SecurePass123!\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register new user account. Returns JWT token for authenticated requests."
+          },
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('auth_token', jsonData.token);",
+                  "    console.log('? Token saved to auth_token');",
+                  "} else {",
+                  "    console.log('? Login failed:', pm.response.text());",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"buyer@realtymind.com\", \"password\": \"SecurePass123!\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login with existing credentials. Returns JWT token."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Geolocation Services",
+      "item": [
+        {
+          "name": "Geocode Address to Coordinates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/geo/geocode?address=1600%20Amphitheatre%20Parkway%2C%20Mountain%20View%2C%20CA",
+              "host": ["{{base_url}}"],
+              "path": ["api", "geo", "geocode"],
+              "query": [
+                {
+                  "key": "address",
+                  "value": "1600 Amphitheatre Parkway, Mountain View, CA"
+                }
+              ]
+            },
+            "description": "Convert address to latitude/longitude coordinates using Google Maps API"
+          },
+          "response": []
+        },
+        {
+          "name": "Reverse Geocode Coordinates to Address",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/geo/reverse?lat=37.4224764&lng=-122.0842499",
+              "host": ["{{base_url}}"],
+              "path": ["api", "geo", "reverse"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "37.4224764"
+                },
+                {
+                  "key": "lng",
+                  "value": "-122.0842499"
+                }
+              ]
+            },
+            "description": "Convert coordinates (lat/lng) back to address using Google Maps reverse geocoding API"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Neighborhood Analysis",
+      "item": [
+        {
+          "name": "Get Nearby POIs - Mountain View",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}",
+                "disabled": true
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/neighborhood/pois?lat=37.4224764&lng=-122.0842499&radius=2000",
+              "host": ["{{base_url}}"],
+              "path": ["api", "neighborhood", "pois"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "37.4224764"
+                },
+                {
+                  "key": "lng",
+                  "value": "-122.0842499"
+                },
+                {
+                  "key": "radius",
+                  "value": "2000"
+                }
+              ]
+            },
+            "description": "Get Points of Interest (POIs) near a location including schools, hospitals, parks, transit, and supermarkets using OpenStreetMap Overpass API"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Nearby POIs - New York City",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/neighborhood/pois?lat=40.7128&lng=-74.0060&radius=1500",
+              "host": ["{{base_url}}"],
+              "path": ["api", "neighborhood", "pois"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "40.7128"
+                },
+                {
+                  "key": "lng",
+                  "value": "-74.0060"
+                },
+                {
+                  "key": "radius",
+                  "value": "1500"
+                }
+              ]
+            },
+            "description": "Get POIs for NYC area (Times Square nearby)"
+          },
+          "response": []
+        },
+        {
+          "name": "Calculate Neighborhood Score - Mountain View",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/neighborhood/score?lat=37.4224764&lng=-122.0842499",
+              "host": ["{{base_url}}"],
+              "path": ["api", "neighborhood", "score"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "37.4224764"
+                },
+                {
+                  "key": "lng",
+                  "value": "-122.0842499"
+                }
+              ]
+            },
+            "description": "Calculate comprehensive neighborhood quality score (0-100) based on transit access, schools, healthcare, grocery stores, parks, and crime"
+          },
+          "response": []
+        },
+        {
+          "name": "Calculate Neighborhood Score - New York City",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/neighborhood/score?lat=40.7128&lng=-74.0060",
+              "host": ["{{base_url}}"],
+              "path": ["api", "neighborhood", "score"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "40.7128"
+                },
+                {
+                  "key": "lng",
+                  "value": "-74.0060"
+                }
+              ]
+            },
+            "description": "Get neighborhood score for NYC area"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Property Services",
+      "item": [
+        {
+          "name": "Get Property Details - Zillow",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/property/provider/zillow?address=1600%20Amphitheatre%20Parkway%2C%20Mountain%20View%2C%20CA%2094043",
+              "host": ["{{base_url}}"],
+              "path": ["api", "property", "provider", "zillow"],
+              "query": [
+                {
+                  "key": "address",
+                  "value": "1600 Amphitheatre Parkway, Mountain View, CA 94043"
+                }
+              ]
+            },
+            "description": "Get property market data and details from Zillow (via RapidAPI)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Property Details - Brooklyn Address",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/property/provider/zillow?address=123%20Main%20Street%2C%20Brooklyn%2C%20NY%2011201",
+              "host": ["{{base_url}}"],
+              "path": ["api", "property", "provider", "zillow"],
+              "query": [
+                {
+                  "key": "address",
+                  "value": "123 Main Street, Brooklyn, NY 11201"
+                }
+              ]
+            },
+            "description": "Get property details for a Brooklyn, NY property"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Finance & Mortgages",
+      "item": [
+        {
+          "name": "Get Current Mortgage Rates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/finance/rates?region=IN",
+              "host": ["{{base_url}}"],
+              "path": ["api", "finance", "rates"],
+              "query": [
+                {
+                  "key": "region",
+                  "value": "IN",
+                  "description": "Region code (default: IN for India)"
+                }
+              ]
+            },
+            "description": "Get current mortgage interest rates for a specific region"
+          },
+          "response": []
+        },
+        {
+          "name": "Calculate Mortgage - 30 Year Loan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"principal\": 300000, \"annualRatePercent\": 6.5, \"termMonths\": 360, \"paymentsPerYear\": 12, \"extraMonthlyPayment\": 0}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/finance/mortgage/calc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "finance", "mortgage", "calc"]
+            },
+            "description": "Calculate monthly mortgage payment and full amortization schedule for a 30-year loan"
+          },
+          "response": []
+        },
+        {
+          "name": "Calculate Mortgage - 20 Year Loan with Extra Payments",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"principal\": 500000, \"annualRatePercent\": 5.8, \"termMonths\": 240, \"paymentsPerYear\": 12, \"extraMonthlyPayment\": 100}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/finance/mortgage/calc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "finance", "mortgage", "calc"]
+            },
+            "description": "Calculate mortgage for $500k loan over 20 years with $100 extra monthly payment"
+          },
+          "response": []
+        },
+        {
+          "name": "Calculate Mortgage - Low Rate Short Term",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"principal\": 250000, \"annualRatePercent\": 4.5, \"termMonths\": 180, \"paymentsPerYear\": 12, \"extraMonthlyPayment\": 500}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/finance/mortgage/calc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "finance", "mortgage", "calc"]
+            },
+            "description": "Calculate mortgage for $250k at low rate over 15 years with aggressive extra payments"
+          },
+          "response": []
+        },
+        {
+          "name": "Calculate Mortgage - High Loan Amount",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"principal\": 750000, \"annualRatePercent\": 7.2, \"termMonths\": 360, \"paymentsPerYear\": 12, \"extraMonthlyPayment\": 0}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/finance/mortgage/calc",
+              "host": ["{{base_url}}"],
+              "path": ["api", "finance", "mortgage", "calc"]
+            },
+            "description": "Calculate mortgage for a larger loan amount ($750k at 7.2% for 30 years)"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://localhost:7073",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_email",
+      "value": "buyer@realtymind.com",
+      "type": "string"
+    }
+  ]
+}
