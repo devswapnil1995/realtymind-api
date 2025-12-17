@@ -3,6 +3,7 @@ using RealtyMind.Application.Services.Auth;
 using RealtyMind.Application.Services.Finance;
 using RealtyMind.Application.Services.Geo;
 using RealtyMind.Application.Services.Google;
+using RealtyMind.Application.Services.Market;
 using RealtyMind.Application.Services.Property;
 
 ///<summary>
@@ -23,6 +24,7 @@ namespace RealtyMind.Application
             services.AddScoped<LoanCalculatorService>();
             services.AddScoped<OverpassService>();
             services.AddScoped<NeighborhoodScoringService>();
+            services.AddScoped<MarketTrendService>();
 
             return services;
         }

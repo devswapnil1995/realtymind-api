@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
+using RealtyMind.Application.Interfaces;
 using RealtyMind.Infrastructure.Data;
+using RealtyMind.Infrastructure.Repositories;
 
 namespace RealtyMind.Infrastructure
 {
@@ -12,6 +14,7 @@ namespace RealtyMind.Infrastructure
             //Register DB Connectext
 
             services.AddDbContext<AppDbContext>(options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+            services.AddScoped<IMarketPriceIndexRepository, MarketPriceIndexRepository>();
 
             return services;
         }

@@ -10,14 +10,20 @@ namespace RealtyMind.Application.Services.Geo
     public class NeighborhoodScoringService
     {
         private readonly OverpassService _overpass;
-
-        public NeighborhoodScoringService(OverpassService overpass)
+        private readonly IMemoryCache _cache;
+        public NeighborhoodScoringService(OverpassService overpass, IMemoryCache cache)
         {
             _overpass = overpass;
+            _cache = cache;
         }
 
         public async Task<NeighborhoodScoreResult> CalculateScoreAsync(double lat, double lng)
         {
+            var cacheKey = $"nb_score_{lat}_{lng}";
+
+            if (_cache.TryGetValue(cacheKey, out NeighborhoodScoreResult cached))
+                return cached;
+
             var pois = await _overpass.GetPoisAsync(lat, lng);
 
             double transitScore = ComputeCategoryScore(pois, "bus_stop", lat, lng, 1000);
@@ -45,13 +51,17 @@ namespace RealtyMind.Application.Services.Geo
                 parkScore,
                 crimeScore
             };
+            
 
-            return new NeighborhoodScoreResult
+            var result = new NeighborhoodScoreResult
             {
                 Score = Math.Round(final, 2),
                 BreakdownJson = System.Text.Json.JsonSerializer.Serialize(breakdown),
                 CalculatedAt = DateTime.UtcNow
             };
+            _cache.Set(cacheKey, result, TimeSpan.FromHours(24));
+
+            return result;
         }
 
         private double ComputeCountScore(List<PoiDto> pois, string category, int radius, int pointsPerItem)

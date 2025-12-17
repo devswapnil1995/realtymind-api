@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using RealtyMind.Api.Middleware;
 using RealtyMind.Application;
 using RealtyMind.Application.Configurations;
 using RealtyMind.Infrastructure;
+using RealtyMind.Infrastructure.Data;
+using RealtyMind.Infrastructure.Data.Seed;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -73,12 +76,20 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        MarketIndexSeeder.Seed(db);
+    }
+
 }
 
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<SimpleRateLimitMiddleware>();
 
 // Map endpoints
 app.MapGet("/health", () =>
